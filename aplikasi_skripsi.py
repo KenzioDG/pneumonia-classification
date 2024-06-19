@@ -95,7 +95,7 @@ def main():
     tab1, tab2 = st.tabs(['Multiclass', 'Two Stage Binary'])
 
     with tab1:
-        model_path = r"models\mobilenetv2_ME8.h5"
+        model_path = r"mobilenetv2_ME8.h5"
         model = load_model_safe(model_path)
         class_labels = ['Bacterial', 'Normal', 'Viral']
 
@@ -133,7 +133,7 @@ def main():
                 st.error(f"Error processing image: {e}")
 
     with tab2:
-        model_path = r"models\mobilenetv2_ME8_BinaryNormal.h5"
+        model_path = r"mobilenetv2_ME8_BinaryNormal.h5"
         model = load_model_safe(model_path)
         class_labels = ['Normal', 'Pneumonia']
 
@@ -181,9 +181,9 @@ def main():
                         st.experimental_rerun()
 
                 if st.session_state.confirmed:
-                    # pneumonia_class = ['Bacterial', 'Viral']
+                    pneumonia_class = ['Bacterial', 'Viral']
                     try:
-                        model_path = r"models\mobilenetv2_ME9_BinaryPneumonia.h5"
+                        model_path = r"mobilenetv2_ME9_BinaryPneumonia.h5"
                         model = load_model_safe(model_path)
                         class_labels = ['Bacterial', 'Viral']                       
                         

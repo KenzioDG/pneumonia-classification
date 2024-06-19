@@ -181,7 +181,7 @@ def main():
                         st.experimental_rerun()
 
                 if st.session_state.confirmed:
-                    pneumonia_class = ['Bacterial', 'Viral']
+                    # pneumonia_class = ['Bacterial', 'Viral']
                     try:
                         model_path = r"models\mobilenetv2_ME9_BinaryPneumonia.h5"
                         model = load_model_safe(model_path)

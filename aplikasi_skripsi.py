@@ -64,6 +64,12 @@ def update_progress_bar(progress_bar, progress, step, total_steps):
 # Main application
 def main():
     st.title('Pneumonia Classification')
+    st.write("""
+    This application helps in classifying pneumonia from chest X-ray images. 
+    You can either perform a multiclass classification to identify if the pneumonia 
+    is Bacterial, Normal, or Viral, or use the two-stage binary classification to first 
+    detect pneumonia and then identify its type.
+    """)
 
     # CSS for fixed position elements
     st.markdown(
@@ -92,14 +98,36 @@ def main():
         st.session_state.username = None
         st.experimental_rerun()
 
+    # Sidebar content
+    st.sidebar.title("Welcome!")
+    st.sidebar.write(f"Hello, {st.session_state.username}!")
+    st.sidebar.header("How to Use This Application")
+    st.sidebar.write("""
+    - **Upload Image**: Choose an image file (JPG, JPEG, PNG) for classification.
+    - **Multiclass Tab**: Predicts whether the image is Bacterial, Normal, or Viral.
+    - **Two Stage Binary Tab**: First checks if the image is Normal or Pneumonia, and if Pneumonia, further classifies into Bacterial or Viral.
+    - **View Results**: See the predicted class and confidence score.
+    - **Logout**: Click the logout button to end your session.
+    """)
+    st.sidebar.header("Download Data")
+    st.sidebar.write("You can download the sample data to test the application [here](https://drive.google.com/drive/folders/1V-rkXiJo2H-yFYVortlLsNXDGO4kBKp9?usp=sharing).")
+
     tab1, tab2 = st.tabs(['Multiclass', 'Two Stage Binary'])
 
     with tab1:
+        st.subheader("Multiclass Classification")
+        st.write("""
+        In this tab, you can upload a chest X-ray image to classify it into one of the following categories:
+        - **Bacterial Pneumonia**
+        - **Normal**
+        - **Viral Pneumonia**
+        """)
+        
         model_path = r"mobilenetv2_ME8.h5"
         model = load_model_safe(model_path)
         class_labels = ['Bacterial', 'Normal', 'Viral']
 
-        uploaded_file = st.file_uploader('Choose an image...', type=['jpg', 'jpeg', 'png'])
+        uploaded_file = st.file_uploader('Choose an image... (you can download test images in the sidebar)', type=['jpg', 'jpeg', 'png'])
 
         if uploaded_file is not None:
             try:
@@ -133,11 +161,17 @@ def main():
                 st.error(f"Error processing image: {e}")
 
     with tab2:
+        st.subheader("Two Stage Binary Classification")
+        st.write("""
+        In this tab, you can upload a chest X-ray image to first classify it as Normal or Pneumonia. 
+        If the image is classified as Pneumonia, it will further be classified as either Bacterial or Viral Pneumonia by a separate classification model.
+        """)
+        
         model_path = r"mobilenetv2_ME8_BinaryNormal.h5"
         model = load_model_safe(model_path)
         class_labels = ['Normal', 'Pneumonia']
 
-        uploaded_binarynorm = st.file_uploader('Choose an image...', type=['jpg', 'jpeg', 'png'], key=2)
+        uploaded_binarynorm = st.file_uploader('Choose an image... (you can download test image in the sidebar)', type=['jpg', 'jpeg', 'png'], key=2)
 
         if uploaded_binarynorm is not None:
             try:
@@ -167,47 +201,50 @@ def main():
                 st.success(f"Predicted Class: {predicted_class} (confidence: {score:.2f})")
                 st.metric(label="Predicted Class", value=predicted_class)
                 st.metric(label="Confidence Score", value=f"{score:.2f}")
+                
+                if predicted_class == "Pneumonia":
+                    if 'confirmed' not in st.session_state:
+                        st.session_state.confirmed = False
+
+                    if not st.session_state.confirmed:
+                        st.warning('Pneumonia detected, would you like to try and identify the cause? (Bacterial/Viral)')
+                        if st.button('Confirm'):
+                            st.session_state.confirmed = True
+                            st.experimental_rerun()
+
+                    if st.session_state.confirmed:
+                        pneumonia_class = ['Bacterial', 'Viral']
+                        try:
+                            model_path = r"mobilenetv2_ME9_BinaryPneumonia.h5"
+                            model = load_model_safe(model_path)
+                            class_labels = ['Bacterial', 'Viral']                       
+                            
+                            progress_bar = st.progress(0)
+                            total_steps = 5
+                            progress = 0
+
+                            with st.spinner('Classifying...'):
+                                progress = update_progress_bar(progress_bar, progress, 2, total_steps)
+                                predictions = model.predict(img_array)
+                                score = np.max(predictions)
+                                predicted_class = pneumonia_class[np.argmax(predictions)]
+
+                                progress = update_progress_bar(progress_bar, progress, 3, total_steps)
+
+                            st.success(f"Predicted Class: {predicted_class} (confidence: {score:.2f})")
+                            st.metric(label="Predicted Class", value=predicted_class)
+                            st.metric(label="Confidence Score", value=f"{score:.2f}")
+                        except Exception as e:
+                            st.error(f"Error processing image with secondary model: {e}")
+
             except Exception as e:
                 st.error(f"Error processing image: {e}")
 
-            if predicted_class == "Pneumonia":
-                if 'confirmed' not in st.session_state:
-                    st.session_state.confirmed = False
-
-                if not st.session_state.confirmed:
-                    st.warning('Pneumonia detected, would you like to try and identify the cause? (Bacterial/Viral)')
-                    if st.button('Confirm'):
-                        st.session_state.confirmed = True
-                        st.experimental_rerun()
-
-                if st.session_state.confirmed:
-                    pneumonia_class = ['Bacterial', 'Viral']
-                    try:
-                        model_path = r"mobilenetv2_ME9_BinaryPneumonia.h5"
-                        model = load_model_safe(model_path)
-                        class_labels = ['Bacterial', 'Viral']                       
-                        
-                        progress_bar = st.progress(0)
-                        total_steps = 5
-                        progress = 0
-
-                        with st.spinner('Classifying...'):
-                            progress = update_progress_bar(progress_bar, progress, 2, total_steps)
-                            predictions = model.predict(img_array)
-                            score = np.max(predictions)
-                            predicted_class = pneumonia_class[np.argmax(predictions)]
-
-                            progress = update_progress_bar(progress_bar, progress, 3, total_steps)
-
-                        st.success(f"Predicted Class: {predicted_class} (confidence: {score:.2f})")
-                        st.metric(label="Predicted Class", value=predicted_class)
-                        st.metric(label="Confidence Score", value=f"{score:.2f}")
-                    except Exception as e:
-                        st.error(f"Error processing image with secondary model: {e}")
 
 # Login function
 def login():
     st.title('Login')
+    st.write("Please enter your username and password to log in.")
 
     username = st.text_input('Username')
     password = st.text_input('Password', type='password')
@@ -233,6 +270,7 @@ def login():
 # Registration function
 def register():
     st.title('Register')
+    st.write("Create a new account by choosing a unique username and password.")
 
     username = st.text_input('New Username')
     password = st.text_input('New Password', type='password')

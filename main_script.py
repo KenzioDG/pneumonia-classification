@@ -27,7 +27,7 @@ def main():
 
     st.sidebar.markdown('4. **View Results:** The app displays predicted class and confidence score.')
 
-    st.sidebar.markdown('5. **Download Sample Data:** [Download Sample Data](https://drive.google.com/drive/folders/1V-rkXiJo2H-yFYVortlLsNXDGO4kBKp9?usp=sharing)')
+    st.sidebar.markdown('5. **Download Sample Data:** [HERE](https://drive.google.com/drive/folders/1V-rkXiJo2H-yFYVortlLsNXDGO4kBKp9?usp=sharing)')
 
     st.title('Pneumonia Classification Application')
     st.markdown('This application enables users to analyze chest X-ray images for the detection of pneumonia. By uploading an image, users can utilize deep learning models to classify and identify pneumonia conditions based on visual data. The app provides detailed classification results and confidence scores, aiding in medical diagnostics and decision-making processes.')

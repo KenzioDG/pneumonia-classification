@@ -69,7 +69,7 @@ def main():
         model = load_model_safe(model_path)
         class_labels = ['Bacterial', 'Normal', 'Viral']
 
-        uploaded_file = st.file_uploader('Choose an image...', type=['jpg', 'jpeg', 'png'], key="multiclass")
+        uploaded_file = st.file_uploader('Choose an image... (you can download samples from the sidebar)', type=['jpg', 'jpeg', 'png'], key="multiclass")
         if uploaded_file is not None:
             try:
                 img = Image.open(uploaded_file)
@@ -127,7 +127,7 @@ def main():
         model = load_model_safe(model_path)
         class_labels = ['Normal', 'Pneumonia']
 
-        uploaded_binarynorm = st.file_uploader('Choose an image...', type=['jpg', 'jpeg', 'png'], key="binary")
+        uploaded_binarynorm = st.file_uploader('Choose an image... (you can download samples from the sidebar)', type=['jpg', 'jpeg', 'png'], key="binary")
         if uploaded_binarynorm is not None:
             try:
                 img = Image.open(uploaded_binarynorm)

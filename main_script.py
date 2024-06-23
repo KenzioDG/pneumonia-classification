@@ -11,7 +11,7 @@ import uuid
 from utils import (
     init_db, load_model_safe, authenticate_user, register_user,
     update_progress_bar, clear_inputs, generate_patient_id,
-    save_patient_data, reset_state
+    save_patient_data, reset_state, login, register
 )
 
 K.clear_session()
@@ -215,6 +215,13 @@ def main():
                 st.error(f"Error processing image: {e}")
 
 
+# Initialize session state variables
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'page' not in st.session_state:
+    st.session_state.page = 'login'
+if 'first_classification_done' not in st.session_state:
+    st.session_state.first_classification_done = False
 # Main app logic
 if st.session_state.logged_in:
     main()

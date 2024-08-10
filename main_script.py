@@ -176,7 +176,7 @@ def main():
                 if st.session_state.get('first_classification_done'):
                     if st.session_state.predicted_class == "Pneumonia":
                         pneumonia_class = ['Bacterial', 'Viral']
-                        model_path = r"mobilenetv2_ME9_BinaryPneumonia.h5"
+                        model_path = r"mobilenetv2_ME8_BinaryPneumonia.h5"
 
                         if not st.session_state.get('confirm_clicked'):
                             st.warning('Pneumonia detected. Proceeding with second stage classification (Bacterial/Viral).')
